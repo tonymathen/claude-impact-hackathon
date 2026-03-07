@@ -1,0 +1,20 @@
+{
+  "name": "pipe-to-pacific",
+  "version": "1.0.0",
+  "description": "Pipe to Pacific -- San Diego Wastewater Impact Tracker",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "download-data": "bash data/scripts/download.sh"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "cors": "^2.8.6",
+    "csv-parser": "^3.2.0",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "zod": "^3.24.0"
+  }
+}
