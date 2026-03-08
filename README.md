@@ -88,5 +88,5 @@ MCP Server (port 3001)
 
 ## Demo Video
 
-https://youtu.be/aJ7jkVyA2iQ
+[https://youtu.be/aJ7jkVyA2iQ](https://youtu.be/vMbzi35nATI)
 
