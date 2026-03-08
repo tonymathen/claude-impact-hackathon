@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pipe to Pacific -- SD Wastewater Impact Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
@@ -28,16 +29,22 @@
     #anomaly-banner .close-btn:hover { opacity: 1; }
     .banner-critical { background: var(--danger); color: white; }
     .banner-warning { background: var(--warning); color: #1a1a1a; }
-    header { background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
-    .logo { display: flex; align-items: center; gap: 10px; }
-    .logo h1 { font-size: 18px; color: var(--text-bright); font-weight: 700; }
-    .logo span { color: var(--accent); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-    .stats-bar { display: flex; gap: 24px; }
-    .stat { text-align: center; }
-    .stat-value { font-size: 18px; font-weight: 700; color: var(--accent); }
-    .stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
-    .dashboard { display: grid; grid-template-columns: 1fr 420px; height: calc(100vh - 56px); }
-    .dashboard.has-banner { height: calc(100vh - 56px - 40px); }
+    header { background: linear-gradient(135deg, var(--bg-panel) 0%, #0a1628 100%); border-bottom: 1px solid var(--border); padding: 0 20px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: relative; }
+    header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), #0ea5e9, var(--accent)); opacity: 0.6; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), #0ea5e9); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 2px 8px rgba(0,180,216,0.3); }
+    .logo-text { display: flex; flex-direction: column; }
+    .logo h1 { font-size: 17px; color: var(--text-bright); font-weight: 800; letter-spacing: -0.3px; line-height: 1.2; }
+    .logo h1 em { font-style: normal; color: var(--accent); }
+    .logo span { color: var(--text-dim); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 1.5px; }
+    .stats-bar { display: flex; gap: 6px; align-items: center; }
+    .stat { text-align: center; padding: 4px 14px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid transparent; transition: border-color 0.2s; }
+    .stat:hover { border-color: var(--border); }
+    .stat-value { font-size: 17px; font-weight: 700; color: var(--accent); }
+    .stat-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-divider { width: 1px; height: 28px; background: var(--border); margin: 0 4px; }
+    .dashboard { display: grid; grid-template-columns: 1fr 420px; height: calc(100vh - 62px); }
+    .dashboard.has-banner { height: calc(100vh - 62px - 40px); }
     #map { border-right: 1px solid var(--border); }
     .side-panel { display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
     .charts-panel { border-bottom: 1px solid var(--border); display: flex; flex-direction: column; min-height: 0; }
@@ -59,8 +66,8 @@
     .chart-container canvas { width: 100% !important; height: 100% !important; }
     .expand-hint { position: absolute; top: 8px; right: 12px; font-size: 10px; color: var(--text-dim); opacity: 0; transition: opacity 0.2s; pointer-events: none; }
     .chart-container:hover .expand-hint { opacity: 1; }
-    .popout-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(6,14,26,0.85); z-index: 10001; align-items: center; justify-content: center; }
-    .popout-overlay.visible { display: flex; }
+    .popout-overlay { display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(6,14,26,0.85); z-index: 10001; align-items: center; justify-content: center; }
+    .popout-overlay.visible { }
     .popout-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; width: 85vw; height: 75vh; max-width: 1100px; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 12px 48px rgba(0,0,0,0.6); }
     .popout-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
     .popout-header h3 { color: var(--accent); font-size: 16px; }
@@ -109,18 +116,18 @@
     .chat-input-area button { background: var(--accent); border: none; border-radius: 8px; padding: 10px 16px; color: #000; font-weight: 600; cursor: pointer; font-size: 13px; }
     .chat-input-area button:hover { opacity: 0.9; }
     .chat-input-area button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .leaflet-popup-content-wrapper { background: var(--bg-card) !important; color: var(--text) !important; border: 1px solid var(--border) !important; border-radius: 8px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important; }
-    .leaflet-popup-tip { background: var(--bg-card) !important; }
+    .leaflet-popup-content-wrapper { background: rgba(12,24,41,0.95) !important; backdrop-filter: blur(8px) !important; color: var(--text) !important; border: 1px solid var(--border) !important; border-radius: 8px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important; }
+    .leaflet-popup-tip { background: rgba(12,24,41,0.95) !important; }
     .leaflet-popup-content { font-size: 12px !important; line-height: 1.5 !important; }
     .leaflet-popup-content strong { color: var(--accent); }
-    .map-info { position: absolute; top: 10px; left: 50px; z-index: 999; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px; max-width: 260px; font-size: 12px; }
+    .map-info { position: absolute; top: 10px; left: 50px; z-index: 999; background: rgba(12,24,41,0.92); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 8px; padding: 12px; max-width: 260px; font-size: 12px; }
     .map-info h3 { color: var(--accent); font-size: 13px; margin-bottom: 6px; }
     .map-info p { color: var(--text-dim); margin-bottom: 8px; }
     .tour-btn { background: var(--accent); color: #000; border: none; border-radius: 6px; padding: 8px 14px; font-weight: 600; cursor: pointer; font-size: 12px; width: 100%; }
     .tour-btn:hover { opacity: 0.9; }
     .tour-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .tour-progress { margin-top: 6px; font-size: 11px; color: var(--text-dim); text-align: center; display: none; }
-    .map-legend { position: absolute; bottom: 20px; left: 10px; z-index: 999; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 11px; }
+    .map-legend { position: absolute; bottom: 20px; left: 10px; z-index: 999; background: rgba(12,24,41,0.92); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 11px; }
     .map-legend h4 { color: var(--text-bright); margin-bottom: 6px; font-size: 12px; }
     .legend-item { display: flex; align-items: center; gap: 6px; margin: 3px 0; color: var(--text-dim); }
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -143,7 +150,7 @@
     .map-legend.minimized .widget-body,
     .time-slider-box.minimized .widget-body { display: none; }
     .map-info.minimized, .noaa-panel.minimized, .map-legend.minimized, .time-slider-box.minimized { padding: 6px 10px; min-width: auto; }
-    .time-slider-box { padding: 10px 18px; text-align: center; min-width: 320px; }
+    .time-slider-box { padding: 10px 18px; text-align: center; min-width: 320px; background: rgba(12,24,41,0.92); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 8px; z-index: 999; }
     .time-slider-box label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
     .time-slider-box .year-display { font-size: 22px; font-weight: 700; color: var(--accent); margin: 2px 0; }
     .time-slider-box input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; }
@@ -152,7 +159,7 @@
     .time-slider-box button { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; color: var(--text); padding: 3px 10px; font-size: 11px; cursor: pointer; }
     .time-slider-box button:hover { border-color: var(--accent); }
     .time-slider-box button.active { background: var(--accent); color: #000; border-color: var(--accent); }
-    .noaa-panel { position: absolute; bottom: 90px; right: 10px; z-index: 999; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 11px; min-width: 180px; }
+    .noaa-panel { position: absolute; bottom: 90px; right: 10px; z-index: 999; background: rgba(12,24,41,0.92); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 11px; min-width: 180px; }
     .noaa-panel h4 { color: var(--accent); font-size: 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
     .noaa-panel .live-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
     .noaa-panel .noaa-row { display: flex; justify-content: space-between; margin: 3px 0; }
@@ -162,8 +169,8 @@
     .noaa-panel .noaa-mini-chart canvas { width: 100% !important; height: 40px !important; }
     .info-btn { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 10px; font-weight: 700; font-style: italic; font-family: Georgia, serif; cursor: pointer; border: none; margin-left: 4px; vertical-align: middle; line-height: 1; position: relative; flex-shrink: 0; }
     .info-btn:hover { background: var(--accent); color: #000; }
-    .info-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; }
-    .info-overlay.visible { display: flex; }
+    .info-overlay { display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; }
+    .info-overlay.visible { }
     .info-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; max-width: 420px; width: 90%; color: var(--text); font-size: 13px; line-height: 1.7; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
     .info-box h3 { color: var(--accent); font-size: 15px; margin-bottom: 10px; }
     .info-box dt { color: var(--accent); font-weight: 700; margin-top: 8px; }
@@ -174,23 +181,106 @@
     .tab .info-btn { margin-left: 2px; }
     .insight-card { position: relative; }
     .insight-card .info-btn { position: absolute; top: 4px; right: 4px; }
+
+    /* Loading overlay */
+    .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg-dark); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
+    .loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+    .loading-spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { margin-top: 16px; color: var(--text-dim); font-size: 14px; letter-spacing: 0.5px; }
+    .loading-subtext { margin-top: 6px; color: var(--text-dim); font-size: 11px; opacity: 0.6; }
+
+    /* Smooth modal animations */
+    .popout-overlay, .info-overlay { transition: opacity 0.2s ease; opacity: 0; pointer-events: none; }
+    .popout-overlay.visible, .info-overlay.visible { opacity: 1; pointer-events: auto; }
+    .popout-box, .chat-popout-box, .info-box { transform: scale(0.95) translateY(10px); transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); }
+    .popout-overlay.visible .popout-box, .popout-overlay.visible .chat-popout-box, .info-overlay.visible .info-box { transform: scale(1) translateY(0); }
+
+    /* Focus styles for accessibility */
+    .tab:focus-visible, .info-btn:focus-visible, .tour-btn:focus-visible, .expand-chat-btn:focus-visible, .popout-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .chat-input-area input:focus-visible, .chat-popout-box input:focus-visible { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,180,216,0.25); }
+    button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* Data freshness indicator */
+    .freshness { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-dim); }
+    .freshness-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+    .freshness-dot.stale { background: var(--warning); }
+
+    /* Header stat info button */
+    .stat-with-info { position: relative; }
+    .stat-with-info .info-btn { position: absolute; top: -2px; right: -10px; width: 14px; height: 14px; font-size: 9px; }
+
+    /* Responsive: tablets and small screens */
+    @media (max-width: 1024px) {
+      .dashboard { grid-template-columns: 1fr 340px; }
+      .stats-bar { gap: 14px; }
+      .stat-value { font-size: 15px; }
+      .insight-cards { grid-template-columns: repeat(2, 1fr); }
+      .popout-box { width: 92vw; height: 80vh; }
+      .chat-popout-box { width: 92vw; }
+    }
+
+    /* Responsive: mobile */
+    @media (max-width: 768px) {
+      header { flex-direction: column; height: auto; padding: 10px 12px; gap: 8px; }
+      header::after { display: none; }
+      .logo { justify-content: center; }
+      .logo-icon { width: 30px; height: 30px; font-size: 16px; border-radius: 8px; }
+      .stats-bar { gap: 8px; justify-content: center; flex-wrap: wrap; }
+      .stat-divider { display: none; }
+      .stat-value { font-size: 14px; }
+      .stat-label { font-size: 9px; }
+      .dashboard { grid-template-columns: 1fr; height: auto; overflow-y: auto; }
+      #map { height: 50vh; min-height: 300px; }
+      .side-panel { overflow-y: visible; }
+      .chat-panel { min-height: 300px; }
+      .map-info { max-width: 200px; font-size: 11px; left: 10px; }
+      .time-slider-box { min-width: 240px; }
+      .popout-box { width: 96vw; height: 85vh; padding: 12px; }
+      .chat-popout-box { width: 96vw; height: 90vh; }
+      .popout-interpret { font-size: 12px; padding: 10px 14px; }
+      body { overflow-y: auto; height: auto; }
+    }
+
+    /* Responsive: small mobile */
+    @media (max-width: 480px) {
+      .logo h1 { font-size: 15px; }
+      .logo span { font-size: 10px; }
+      .insight-cards { grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 6px; }
+      .insight-card .value { font-size: 16px; }
+      .tab { padding: 5px 7px; font-size: 10px; }
+      .chart-container { height: 200px; }
+    }
   </style>
 </head>
 <body>
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading Ocean Data</div>
+    <div class="loading-subtext">Analyzing 24 years of water quality readings...</div>
+  </div>
   <div class="info-overlay" id="info-overlay" onclick="if(event.target===this)closeInfo()">
     <div class="info-box" id="info-box"></div>
   </div>
   <div id="anomaly-banner"></div>
   <header>
     <div class="logo">
-      <h1>Pipe to Pacific</h1>
-      <span>SD Wastewater Impact Tracker</span>
+      <div class="logo-icon">🌊</div>
+      <div class="logo-text">
+        <h1>Pipe <em>to</em> Pacific</h1>
+        <span>SD Wastewater Impact Tracker</span>
+      </div>
     </div>
     <div class="stats-bar">
       <div class="stat"><div class="stat-value" id="stat-stations">--</div><div class="stat-label">Stations</div></div>
+      <div class="stat-divider"></div>
       <div class="stat"><div class="stat-value" id="stat-readings">--</div><div class="stat-label">Readings</div></div>
-      <div class="stat"><div class="stat-value" id="stat-exceedance">--</div><div class="stat-label">Exceedance Rate</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat stat-with-info"><div class="stat-value" id="stat-exceedance">--</div><div class="stat-label">Exceedance Rate</div><button class="info-btn" onclick="showInfo('exceedance')" tabindex="0">i</button></div>
+      <div class="stat-divider"></div>
       <div class="stat"><div class="stat-value" id="stat-years">--</div><div class="stat-label">Years</div></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><div class="freshness" id="freshness"><span class="freshness-dot"></span><span id="freshness-text">Loading...</span></div></div>
     </div>
   </header>
   <div class="dashboard" id="dashboard">
@@ -256,13 +346,13 @@
         <div class="insight-card" id="ins-near"><button class="info-btn" onclick="event.stopPropagation();showInfo('near')">i</button><div class="label">&lt;2km Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
         <div class="insight-card" id="ins-far"><button class="info-btn" onclick="event.stopPropagation();showInfo('far')">i</button><div class="label">&gt;10km Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
       </div>
-      <div class="tab-bar" id="tab-bar">
-        <div class="tab active" data-tab="distance">Distance <button class="info-btn" onclick="event.stopPropagation();showInfo('distance')">i</button></div>
-        <div class="tab" data-tab="yearly">Yearly <button class="info-btn" onclick="event.stopPropagation();showInfo('yearly')">i</button></div>
-        <div class="tab" data-tab="compare">PLOO/SBOO <button class="info-btn" onclick="event.stopPropagation();showInfo('compare')">i</button></div>
-        <div class="tab" data-tab="monthly">Monthly <button class="info-btn" onclick="event.stopPropagation();showInfo('monthly')">i</button></div>
-        <div class="tab" data-tab="fish">Fish <button class="info-btn" onclick="event.stopPropagation();showInfo('fish')">i</button></div>
-        <div class="tab" data-tab="noaa">Live Ocean <button class="info-btn" onclick="event.stopPropagation();showInfo('noaa')">i</button></div>
+      <div class="tab-bar" id="tab-bar" role="tablist">
+        <div class="tab active" data-tab="distance" role="tab" tabindex="0">Distance <button class="info-btn" onclick="event.stopPropagation();showInfo('distance')" aria-label="Info about distance chart">i</button></div>
+        <div class="tab" data-tab="yearly" role="tab" tabindex="0">Yearly <button class="info-btn" onclick="event.stopPropagation();showInfo('yearly')" aria-label="Info about yearly trend">i</button></div>
+        <div class="tab" data-tab="compare" role="tab" tabindex="0">PLOO/SBOO <button class="info-btn" onclick="event.stopPropagation();showInfo('compare')" aria-label="Info about PLOO vs SBOO">i</button></div>
+        <div class="tab" data-tab="monthly" role="tab" tabindex="0">Monthly <button class="info-btn" onclick="event.stopPropagation();showInfo('monthly')" aria-label="Info about monthly chart">i</button></div>
+        <div class="tab" data-tab="fish" role="tab" tabindex="0">Fish <button class="info-btn" onclick="event.stopPropagation();showInfo('fish')" aria-label="Info about fish tissue">i</button></div>
+        <div class="tab" data-tab="noaa" role="tab" tabindex="0">Live Ocean <button class="info-btn" onclick="event.stopPropagation();showInfo('noaa')" aria-label="Info about live ocean data">i</button></div>
       </div>
       <div class="chart-container" onclick="popoutChart()"><span class="expand-hint">Click to expand</span><canvas id="main-chart"></canvas></div>
     </div>
@@ -364,28 +454,48 @@ function formatMarkdown(text) {
 }
 
 async function init() {
-  const [summary, stations, distance, levels, fish] = await Promise.all([
-    fetch('/api/summary').then(r => r.json()),
-    fetch('/api/stations').then(r => r.json()),
-    fetch('/api/bacteria/by-distance').then(r => r.json()),
-    fetch('/api/stations/bacteria-levels').then(r => r.json()),
-    fetch('/api/fish-tissue/species-summary').then(r => r.json()),
-  ]);
+  const loadingEl = document.getElementById('loading-overlay');
+  try {
+    const [summary, stations, distance, levels, fish] = await Promise.all([
+      fetch('/api/summary').then(r => r.json()),
+      fetch('/api/stations').then(r => r.json()),
+      fetch('/api/bacteria/by-distance').then(r => r.json()),
+      fetch('/api/stations/bacteria-levels').then(r => r.json()),
+      fetch('/api/fish-tissue/species-summary').then(r => r.json()),
+    ]);
 
-  distanceData = distance;
-  stationLevels = levels;
-  fishData = fish;
+    distanceData = distance;
+    stationLevels = levels;
+    fishData = fish;
 
-  document.getElementById('stat-stations').textContent = summary.stations;
-  document.getElementById('stat-readings').textContent = formatNumber(summary.bacteriaReadings + summary.chemistryReadings);
-  document.getElementById('stat-exceedance').textContent = summary.exceedanceRate + '%';
-  document.getElementById('stat-years').textContent = summary.yearsCovered;
+    document.getElementById('stat-stations').textContent = summary.stations;
+    document.getElementById('stat-readings').textContent = formatNumber(summary.bacteriaReadings + summary.chemistryReadings);
+    document.getElementById('stat-exceedance').textContent = summary.exceedanceRate + '%';
+    document.getElementById('stat-years').textContent = summary.yearsCovered;
 
-  initMap(stations, levels, summary.outfalls);
-  updateInsights();
-  initChart();
-  setupTabs();
-  loadAnomalies();
+    initMap(stations, levels, summary.outfalls);
+    updateInsights();
+    initChart();
+    setupTabs();
+    loadAnomalies();
+    updateFreshness();
+  } catch (err) {
+    console.error('Init error:', err);
+    document.querySelector('.loading-text').textContent = 'Error loading data';
+    document.querySelector('.loading-subtext').textContent = 'Please refresh the page.';
+    document.querySelector('.loading-spinner').style.display = 'none';
+    return;
+  }
+
+  // Dismiss loading overlay
+  loadingEl.classList.add('fade-out');
+  setTimeout(() => loadingEl.remove(), 600);
+}
+
+function updateFreshness() {
+  const now = new Date();
+  const text = `Data loaded ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  document.getElementById('freshness-text').textContent = text;
 }
 
 function updateInsights() {
@@ -414,9 +524,14 @@ function setInsightCard(id, val) {
 function initMap(stations, levels, outfalls) {
   map = L.map('map', { zoomControl: false }).setView([32.62, -117.22], 11);
   L.control.zoom({ position: 'topright' }).addTo(map);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; CARTO',
-    maxZoom: 19
+  // Dark blue ocean-focused basemap
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; Esri, GEBCO, NOAA',
+    maxZoom: 16
+  }).addTo(map);
+  // Add ocean labels on top
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 16
   }).addTo(map);
 
   const outfallIcon = (label) => L.divIcon({
@@ -610,12 +725,21 @@ function renderFishChart() {
 function setupTabs() {
   const tabs = document.querySelectorAll('.tab');
   const renderers = { distance: renderDistanceChart, yearly: renderYearlyChart, compare: renderCompareChart, monthly: renderMonthlyChart, fish: renderFishChart, noaa: renderNoaaChart };
+  function activateTab(tab) {
+    tabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+    tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
+    if (mainChart && mainChart.options.scales.y1) { delete mainChart.options.scales.y1; }
+    renderers[tab.dataset.tab]();
+  }
   tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      if (mainChart && mainChart.options.scales.y1) { delete mainChart.options.scales.y1; }
-      renderers[tab.dataset.tab]();
+    tab.addEventListener('click', () => activateTab(tab));
+    tab.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateTab(tab); }
+      const tabArr = [...tabs];
+      const idx = tabArr.indexOf(tab);
+      if (e.key === 'ArrowRight' && idx < tabArr.length - 1) { tabArr[idx + 1].focus(); }
+      if (e.key === 'ArrowLeft' && idx > 0) { tabArr[idx - 1].focus(); }
     });
   });
 }
@@ -830,6 +954,9 @@ async function loadRealtime() {
     if (realtimeData.error) return;
 
     document.getElementById('noaa-panel').style.display = 'block';
+    // Update freshness with live data timestamp
+    const freshnessEl = document.getElementById('freshness-text');
+    freshnessEl.textContent = `Live ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     const bay = realtimeData.sdBay;
     const wx = realtimeData.weather;
     const buoyTP = realtimeData.buoys.torreyPines.data[0];
@@ -1006,6 +1133,14 @@ const INFO_CONTENT = {
       <dt>Waves (MB)</dt><dd>Wave height and period from the Mission Bay buoy.</dd>
       <dt>hPa</dt><dd>Hectopascals — a unit of atmospheric pressure (1013.25 hPa = standard sea-level pressure).</dd>
     </dl>`,
+  exceedance: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>Exceedance Rate</h3>
+    <p>The percentage of water samples where bacteria levels exceeded the EPA safety limit of <strong>104 CFU/100mL</strong> (Colony-Forming Units per 100 milliliters).</p>
+    <dl>
+      <dt>What does this number mean?</dt><dd>If the exceedance rate is 8%, that means 8 out of every 100 water samples taken had bacteria levels high enough to be unsafe for swimming. On those days, beaches should be closed or have advisories posted.</dd>
+      <dt>Why 104 CFU?</dt><dd>The EPA set this threshold based on epidemiological studies. Swimming in water above 104 CFU/100mL of Enterococcus bacteria significantly increases your risk of gastrointestinal illness.</dd>
+    </dl>
+    <p style="margin-top:10px;color:var(--text-dim)"><strong>Thresholds:</strong> &lt;35 CFU = Safe | 35–104 = Advisory | &gt;104 = Exceedance</p>`,
 };
 
 function showInfo(key) {
