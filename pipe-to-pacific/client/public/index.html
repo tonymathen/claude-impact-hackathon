@@ -36,11 +36,12 @@
     .stat { text-align: center; }
     .stat-value { font-size: 18px; font-weight: 700; color: var(--accent); }
     .stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
-    .dashboard { display: grid; grid-template-columns: 1fr 420px; grid-template-rows: 1fr 1fr; height: calc(100vh - 56px); }
+    .dashboard { display: grid; grid-template-columns: 1fr 420px; height: calc(100vh - 56px); }
     .dashboard.has-banner { height: calc(100vh - 56px - 40px); }
-    #map { grid-row: 1 / 3; border-right: 1px solid var(--border); }
-    .charts-panel { border-bottom: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
-    .chat-panel { display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+    #map { border-right: 1px solid var(--border); }
+    .side-panel { display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+    .charts-panel { border-bottom: 1px solid var(--border); display: flex; flex-direction: column; min-height: 0; }
+    .chat-panel { display: flex; flex-direction: column; flex: 1; min-height: 280px; overflow: hidden; }
     .insight-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; }
     .insight-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; }
     .insight-card .label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
@@ -49,12 +50,44 @@
     .insight-card.safe .value { color: var(--success); }
     .insight-card.warn .value { color: var(--warning); }
     .insight-card.danger .value { color: var(--danger); }
-    .tab-bar { display: flex; border-bottom: 1px solid var(--border); background: var(--bg-panel); }
-    .tab { padding: 8px 14px; font-size: 12px; color: var(--text-dim); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+    .tab-bar { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--border); background: var(--bg-panel); }
+    .tab { padding: 6px 10px; font-size: 11px; color: var(--text-dim); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
     .tab:hover { color: var(--text); }
     .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-    .chart-container { flex: 1; padding: 10px; position: relative; min-height: 0; }
+    .chart-container { padding: 10px; position: relative; height: 240px; cursor: pointer; }
+    .chart-container:hover { background: rgba(0,180,216,0.03); }
     .chart-container canvas { width: 100% !important; height: 100% !important; }
+    .expand-hint { position: absolute; top: 8px; right: 12px; font-size: 10px; color: var(--text-dim); opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+    .chart-container:hover .expand-hint { opacity: 1; }
+    .popout-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(6,14,26,0.85); z-index: 10001; align-items: center; justify-content: center; }
+    .popout-overlay.visible { display: flex; }
+    .popout-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; width: 85vw; height: 75vh; max-width: 1100px; padding: 20px; display: flex; flex-direction: column; box-shadow: 0 12px 48px rgba(0,0,0,0.6); }
+    .popout-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
+    .popout-header h3 { color: var(--accent); font-size: 16px; }
+    .popout-close { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); font-size: 13px; cursor: pointer; padding: 4px 12px; }
+    .popout-close:hover { color: var(--text-bright); border-color: var(--accent); }
+    .popout-chart { flex: 1; position: relative; min-height: 0; }
+    .popout-chart canvas { width: 100% !important; height: 100% !important; }
+    .popout-info-row { display: flex; gap: 8px; margin-bottom: 12px; flex-shrink: 0; }
+    .popout-info-row .insight-card { flex: 1; }
+    .chat-popout-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px; width: 70vw; height: 80vh; max-width: 900px; display: flex; flex-direction: column; box-shadow: 0 12px 48px rgba(0,0,0,0.6); overflow: hidden; }
+    .chat-popout-box .chat-header { padding: 12px 20px; border-bottom: 1px solid var(--border); font-size: 16px; }
+    .chat-popout-box .chat-messages { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+    .chat-popout-box .chat-msg { font-size: 14px; max-width: 80%; }
+    .chat-popout-box .chat-input-area { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+    .chat-popout-box .chat-input-area input { flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--text); font-size: 14px; outline: none; }
+    .chat-popout-box .chat-input-area input:focus { border-color: var(--accent); }
+    .chat-popout-box .chat-input-area button { background: var(--accent); border: none; border-radius: 8px; padding: 12px 20px; color: #000; font-weight: 600; cursor: pointer; font-size: 14px; }
+    .chat-popout-box .typing-indicator { padding: 10px 20px; }
+    .expand-chat-btn { background: none; border: 1px solid var(--border); border-radius: 4px; color: var(--text-dim); font-size: 11px; cursor: pointer; padding: 2px 8px; }
+    .expand-chat-btn:hover { color: var(--text-bright); border-color: var(--accent); }
+    .popout-interpret { flex-shrink: 0; max-height: 30%; overflow-y: auto; border-top: 1px solid var(--border); padding: 14px 20px; font-size: 13px; line-height: 1.7; color: var(--text); background: var(--bg-card); border-radius: 0 0 12px 12px; }
+    .popout-interpret h4 { color: var(--accent); font-size: 13px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .popout-interpret h4::before { content: ''; display: inline-block; width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+    .popout-interpret .takeaway { background: rgba(0,180,216,0.08); border-left: 3px solid var(--accent); padding: 8px 12px; margin-top: 10px; border-radius: 0 6px 6px 0; font-size: 13px; color: var(--text-bright); }
+    .popout-interpret .stat-highlight { font-weight: 700; color: var(--accent); }
+    .popout-interpret .danger-highlight { font-weight: 700; color: var(--danger); }
+    .popout-interpret .safe-highlight { font-weight: 700; color: var(--success); }
     .chat-header { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 600; color: var(--text-bright); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
     .chat-msg { max-width: 95%; padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
@@ -127,9 +160,26 @@
     .noaa-panel .noaa-value { color: var(--text-bright); font-weight: 600; }
     .noaa-panel .noaa-mini-chart { height: 40px; margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px; }
     .noaa-panel .noaa-mini-chart canvas { width: 100% !important; height: 40px !important; }
+    .info-btn { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: var(--border); color: var(--text-dim); font-size: 10px; font-weight: 700; font-style: italic; font-family: Georgia, serif; cursor: pointer; border: none; margin-left: 4px; vertical-align: middle; line-height: 1; position: relative; flex-shrink: 0; }
+    .info-btn:hover { background: var(--accent); color: #000; }
+    .info-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; }
+    .info-overlay.visible { display: flex; }
+    .info-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; max-width: 420px; width: 90%; color: var(--text); font-size: 13px; line-height: 1.7; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+    .info-box h3 { color: var(--accent); font-size: 15px; margin-bottom: 10px; }
+    .info-box dt { color: var(--accent); font-weight: 700; margin-top: 8px; }
+    .info-box dd { margin-left: 0; color: var(--text); }
+    .info-box .close-info { float: right; background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; margin: -8px -8px 0 0; }
+    .info-box .close-info:hover { color: var(--text-bright); }
+    .tab { display: inline-flex; align-items: center; gap: 3px; }
+    .tab .info-btn { margin-left: 2px; }
+    .insight-card { position: relative; }
+    .insight-card .info-btn { position: absolute; top: 4px; right: 4px; }
   </style>
 </head>
 <body>
+  <div class="info-overlay" id="info-overlay" onclick="if(event.target===this)closeInfo()">
+    <div class="info-box" id="info-box"></div>
+  </div>
   <div id="anomaly-banner"></div>
   <header>
     <div class="logo">
@@ -198,26 +248,28 @@
         </div>
       </div>
     </div>
+    <div class="side-panel">
     <div class="charts-panel">
       <div class="insight-cards">
-        <div class="insight-card" id="ins-ploo-avg"><div class="label">PLOO Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
-        <div class="insight-card" id="ins-sboo-avg"><div class="label">SBOO Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
-        <div class="insight-card" id="ins-near"><div class="label">&lt;2km Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
-        <div class="insight-card" id="ins-far"><div class="label">&gt;10km Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
+        <div class="insight-card" id="ins-ploo-avg"><button class="info-btn" onclick="event.stopPropagation();showInfo('ploo')">i</button><div class="label">PLOO Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
+        <div class="insight-card" id="ins-sboo-avg"><button class="info-btn" onclick="event.stopPropagation();showInfo('sboo')">i</button><div class="label">SBOO Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
+        <div class="insight-card" id="ins-near"><button class="info-btn" onclick="event.stopPropagation();showInfo('near')">i</button><div class="label">&lt;2km Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
+        <div class="insight-card" id="ins-far"><button class="info-btn" onclick="event.stopPropagation();showInfo('far')">i</button><div class="label">&gt;10km Avg</div><div class="value">--</div><div class="unit">CFU/100mL</div></div>
       </div>
       <div class="tab-bar" id="tab-bar">
-        <div class="tab active" data-tab="distance">Distance</div>
-        <div class="tab" data-tab="yearly">Yearly Trend</div>
-        <div class="tab" data-tab="compare">PLOO vs SBOO</div>
-        <div class="tab" data-tab="monthly">Monthly</div>
-        <div class="tab" data-tab="fish">Fish Tissue</div>
-        <div class="tab" data-tab="noaa">Live Ocean</div>
+        <div class="tab active" data-tab="distance">Distance <button class="info-btn" onclick="event.stopPropagation();showInfo('distance')">i</button></div>
+        <div class="tab" data-tab="yearly">Yearly <button class="info-btn" onclick="event.stopPropagation();showInfo('yearly')">i</button></div>
+        <div class="tab" data-tab="compare">PLOO/SBOO <button class="info-btn" onclick="event.stopPropagation();showInfo('compare')">i</button></div>
+        <div class="tab" data-tab="monthly">Monthly <button class="info-btn" onclick="event.stopPropagation();showInfo('monthly')">i</button></div>
+        <div class="tab" data-tab="fish">Fish <button class="info-btn" onclick="event.stopPropagation();showInfo('fish')">i</button></div>
+        <div class="tab" data-tab="noaa">Live Ocean <button class="info-btn" onclick="event.stopPropagation();showInfo('noaa')">i</button></div>
       </div>
-      <div class="chart-container"><canvas id="main-chart"></canvas></div>
+      <div class="chart-container" onclick="popoutChart()"><span class="expand-hint">Click to expand</span><canvas id="main-chart"></canvas></div>
     </div>
     <div class="chat-panel">
       <div class="chat-header">
         <span>AI Ocean Analyst</span>
+        <button class="expand-chat-btn" onclick="popoutChat()">Expand</button>
       </div>
       <div class="chat-messages" id="chat-messages">
         <div class="chat-msg welcome">
@@ -234,6 +286,31 @@
       <div class="chat-input-area">
         <input type="text" id="chat-input" placeholder="Ask about San Diego ocean water quality..." onkeydown="if(event.key==='Enter')sendChat()">
         <button id="chat-send" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+    </div>
+  </div>
+  <div class="popout-overlay" id="popout-overlay" onclick="if(event.target===this)closePopout()">
+    <div class="popout-box">
+      <div class="popout-header">
+        <h3 id="popout-title">Chart</h3>
+        <button class="popout-close" onclick="closePopout()">Esc to close</button>
+      </div>
+      <div class="popout-chart"><canvas id="popout-canvas"></canvas></div>
+      <div class="popout-interpret" id="popout-interpret"></div>
+    </div>
+  </div>
+  <div class="popout-overlay" id="chat-popout-overlay" onclick="if(event.target===this)closeChatPopout()">
+    <div class="chat-popout-box">
+      <div class="chat-header">
+        <span>AI Ocean Analyst</span>
+        <button class="popout-close" onclick="closeChatPopout()">Esc to close</button>
+      </div>
+      <div class="chat-messages" id="chat-popout-messages"></div>
+      <div class="typing-indicator" id="popout-typing" style="display:none"><span></span><span></span><span></span></div>
+      <div class="chat-input-area">
+        <input type="text" id="chat-popout-input" placeholder="Ask about San Diego ocean water quality..." onkeydown="if(event.key==='Enter')sendChatFromPopout()">
+        <button id="chat-popout-send" onclick="sendChatFromPopout()">Send</button>
       </div>
     </div>
   </div>
@@ -561,6 +638,7 @@ async function sendQuestion(question) {
   userMsg.textContent = question;
   messages.appendChild(userMsg);
   messages.scrollTop = messages.scrollHeight;
+  syncMessageToPopout('user', question, false);
 
   typing.style.display = 'flex';
   sendBtn.disabled = true;
@@ -574,16 +652,20 @@ async function sendQuestion(question) {
     const data = await res.json();
 
     typing.style.display = 'none';
+    const content = formatMarkdown(data.answer || data.error || 'No response');
     const assistantMsg = document.createElement('div');
     assistantMsg.className = 'chat-msg assistant';
-    assistantMsg.innerHTML = formatMarkdown(data.answer || data.error || 'No response');
+    assistantMsg.innerHTML = content;
     messages.appendChild(assistantMsg);
+    syncMessageToPopout('assistant', content, true);
   } catch (err) {
     typing.style.display = 'none';
+    const errContent = 'Sorry, I encountered an error. Please try again.';
     const errMsg = document.createElement('div');
     errMsg.className = 'chat-msg assistant';
-    errMsg.textContent = 'Sorry, I encountered an error. Please try again.';
+    errMsg.textContent = errContent;
     messages.appendChild(errMsg);
+    syncMessageToPopout('assistant', errContent, false);
   }
 
   sendBtn.disabled = false;
@@ -842,6 +924,357 @@ async function renderNoaaChart() {
       }
     }
   });
+}
+
+// --- Info Popups ---
+const INFO_CONTENT = {
+  ploo: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>PLOO — Point Loma Ocean Outfall</h3>
+    <dl>
+      <dt>PLOO</dt><dd>Point Loma Ocean Outfall — the main discharge pipe for San Diego's treated wastewater. It extends 4.5 miles offshore at a depth of ~320 feet and discharges ~175 million gallons/day of treated sewage into the Pacific.</dd>
+      <dt>CFU/100mL</dt><dd>Colony-Forming Units per 100 milliliters — the standard measure of bacteria concentration in water. Each CFU represents a viable bacterial cell that can multiply.</dd>
+      <dt>ENTERO</dt><dd>Enterococcus — a fecal indicator bacteria used by the EPA to assess ocean water quality. Higher counts suggest sewage contamination.</dd>
+    </dl>
+    <p style="margin-top:10px;color:var(--text-dim)"><strong>Thresholds:</strong> &lt;35 CFU = Safe | 35–104 = Advisory | &gt;104 = Exceedance (EPA limit)</p>`,
+  sboo: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>SBOO — South Bay Ocean Outfall</h3>
+    <dl>
+      <dt>SBOO</dt><dd>South Bay Ocean Outfall — a smaller outfall near the Tijuana River mouth. It is heavily impacted by cross-border sewage flows from Tijuana, Mexico, leading to significantly higher bacteria levels than PLOO.</dd>
+      <dt>CFU/100mL</dt><dd>Colony-Forming Units per 100 milliliters — the standard measure of bacteria concentration in water.</dd>
+    </dl>
+    <p style="margin-top:10px;color:var(--text-dim)">SBOO readings are typically much higher than PLOO due to untreated or partially treated sewage from cross-border flows.</p>`,
+  near: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>&lt;2km Average</h3>
+    <p>Average Enterococcus bacteria concentration at monitoring stations within 2 kilometers of the nearest ocean outfall.</p>
+    <dl>
+      <dt>CFU/100mL</dt><dd>Colony-Forming Units per 100 milliliters — the standard unit for measuring bacteria in water samples.</dd>
+    </dl>
+    <p style="margin-top:10px;color:var(--text-dim)">Stations closer to the outfall often show lower bacteria because the deep-water discharge gets diluted. Paradoxically, farther stations near shore can show higher levels from land-based runoff.</p>`,
+  far: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>&gt;10km Average</h3>
+    <p>Average Enterococcus bacteria concentration at stations more than 10 kilometers from the nearest outfall.</p>
+    <dl>
+      <dt>CFU/100mL</dt><dd>Colony-Forming Units per 100 milliliters.</dd>
+    </dl>
+    <p style="margin-top:10px;color:var(--text-dim)">Higher readings far from outfalls often indicate land-based pollution sources such as storm drains, urban runoff, and cross-border sewage flows rather than the outfall discharge itself.</p>`,
+  distance: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>Distance Chart</h3>
+    <p>Shows average bacteria (Enterococcus) concentration grouped by distance from the nearest ocean outfall (PLOO or SBOO).</p>
+    <dl>
+      <dt>CFU/100mL</dt><dd>Colony-Forming Units per 100 milliliters — the standard measure of bacteria in water.</dd>
+      <dt>ENTERO</dt><dd>Enterococcus — fecal indicator bacteria used by the EPA for ocean water quality.</dd>
+      <dt>Outfall</dt><dd>The underwater pipe where treated wastewater is discharged into the ocean.</dd>
+    </dl>`,
+  yearly: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>Yearly Trend</h3>
+    <p>Shows Enterococcus bacteria levels across all monitoring stations over time (2000–present).</p>
+    <dl>
+      <dt>Average line</dt><dd>The mean bacteria reading across all stations for each year.</dd>
+      <dt>Max line</dt><dd>The highest single reading recorded that year — spikes often correspond to sewage spills or heavy rain events.</dd>
+      <dt>ENTERO</dt><dd>Enterococcus — the EPA's preferred indicator bacteria for marine recreational waters.</dd>
+    </dl>`,
+  compare: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>PLOO vs SBOO Comparison</h3>
+    <p>Compares annual bacteria trends between San Diego's two ocean outfalls.</p>
+    <dl>
+      <dt>PLOO</dt><dd>Point Loma Ocean Outfall — San Diego's primary outfall, 4.5 miles offshore. Generally has lower bacteria due to deep-water discharge and better dilution.</dd>
+      <dt>SBOO</dt><dd>South Bay Ocean Outfall — near the Tijuana River. Consistently shows higher bacteria due to cross-border sewage contamination from Tijuana, Mexico.</dd>
+    </dl>`,
+  monthly: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>Monthly Bacteria Levels</h3>
+    <p>Shows monthly average bacteria concentration and exceedance counts since 2020.</p>
+    <dl>
+      <dt>Avg CFU/100mL</dt><dd>Average Colony-Forming Units per 100 milliliters for that month across all stations.</dd>
+      <dt>Exceedances</dt><dd>Number of individual readings that exceeded the EPA safety limit of 104 CFU/100mL — triggering a beach advisory or closure.</dd>
+    </dl>`,
+  fish: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>Fish Tissue Contamination</h3>
+    <p>Shows metal concentrations found in fish tissue samples collected near San Diego's outfalls.</p>
+    <dl>
+      <dt>mg/kg</dt><dd>Milligrams per kilogram (parts per million) — the standard unit for measuring contaminant concentration in tissue.</dd>
+      <dt>Metals</dt><dd>Heavy metals such as mercury, selenium, arsenic, and lead that can bioaccumulate in fish tissue and pose health risks to humans who consume contaminated fish.</dd>
+    </dl>
+    <p style="margin-top:10px;color:var(--text-dim)">Fish near outfalls may accumulate metals from treated wastewater discharge over time.</p>`,
+  noaa: `<button class="close-info" onclick="closeInfo()">&times;</button>
+    <h3>Live Ocean Conditions</h3>
+    <p>Real-time data from NOAA (National Oceanic and Atmospheric Administration) stations and buoys in the San Diego area.</p>
+    <dl>
+      <dt>NOAA</dt><dd>National Oceanic and Atmospheric Administration — the U.S. federal agency that monitors ocean and atmospheric conditions.</dd>
+      <dt>Water Temp</dt><dd>Ocean water temperature measured at the SD Bay tide station.</dd>
+      <dt>Tide Level</dt><dd>Current water level relative to mean sea level (MLLW datum).</dd>
+      <dt>Waves (TP)</dt><dd>Wave height and period from the Torrey Pines buoy.</dd>
+      <dt>Waves (MB)</dt><dd>Wave height and period from the Mission Bay buoy.</dd>
+      <dt>hPa</dt><dd>Hectopascals — a unit of atmospheric pressure (1013.25 hPa = standard sea-level pressure).</dd>
+    </dl>`,
+};
+
+function showInfo(key) {
+  const overlay = document.getElementById('info-overlay');
+  const box = document.getElementById('info-box');
+  box.innerHTML = INFO_CONTENT[key] || '<p>No info available.</p>';
+  overlay.classList.add('visible');
+}
+
+function closeInfo() {
+  document.getElementById('info-overlay').classList.remove('visible');
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { closeInfo(); closePopout(); closeChatPopout(); }
+});
+
+// --- Chat Popout ---
+let chatPopoutOpen = false;
+
+function popoutChat() {
+  const overlay = document.getElementById('chat-popout-overlay');
+  const popoutMsgs = document.getElementById('chat-popout-messages');
+  // Clone all messages from the side panel into the popout
+  const sideMsgs = document.getElementById('chat-messages');
+  popoutMsgs.innerHTML = sideMsgs.innerHTML;
+  // Re-bind click handlers on welcome list items
+  popoutMsgs.querySelectorAll('.chat-msg.welcome li').forEach(li => {
+    li.onclick = () => sendChatFromPopout(li.textContent);
+  });
+  overlay.classList.add('visible');
+  chatPopoutOpen = true;
+  popoutMsgs.scrollTop = popoutMsgs.scrollHeight;
+  document.getElementById('chat-popout-input').focus();
+}
+
+function closeChatPopout() {
+  document.getElementById('chat-popout-overlay').classList.remove('visible');
+  chatPopoutOpen = false;
+}
+
+function syncMessageToSidePanel(className, content, isHTML) {
+  const sideMsgs = document.getElementById('chat-messages');
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg ' + className;
+  if (isHTML) msg.innerHTML = content; else msg.textContent = content;
+  sideMsgs.appendChild(msg);
+  sideMsgs.scrollTop = sideMsgs.scrollHeight;
+}
+
+function syncMessageToPopout(className, content, isHTML) {
+  if (!chatPopoutOpen) return;
+  const popoutMsgs = document.getElementById('chat-popout-messages');
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg ' + className;
+  if (isHTML) msg.innerHTML = content; else msg.textContent = content;
+  popoutMsgs.appendChild(msg);
+  popoutMsgs.scrollTop = popoutMsgs.scrollHeight;
+}
+
+async function sendChatFromPopout(prefill) {
+  const input = document.getElementById('chat-popout-input');
+  const question = prefill || input.value.trim();
+  if (!question) return;
+  input.value = '';
+
+  const popoutMsgs = document.getElementById('chat-popout-messages');
+  const popoutTyping = document.getElementById('popout-typing');
+  const sendBtn = document.getElementById('chat-popout-send');
+
+  // Add user message to both panels
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.textContent = question;
+  popoutMsgs.appendChild(userMsg);
+  popoutMsgs.scrollTop = popoutMsgs.scrollHeight;
+  syncMessageToSidePanel('user', question, false);
+
+  popoutTyping.style.display = 'flex';
+  sendBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question }),
+    });
+    const data = await res.json();
+    popoutTyping.style.display = 'none';
+
+    const content = formatMarkdown(data.answer || data.error || 'No response');
+    const assistantMsg = document.createElement('div');
+    assistantMsg.className = 'chat-msg assistant';
+    assistantMsg.innerHTML = content;
+    popoutMsgs.appendChild(assistantMsg);
+    popoutMsgs.scrollTop = popoutMsgs.scrollHeight;
+    syncMessageToSidePanel('assistant', content, true);
+  } catch (err) {
+    popoutTyping.style.display = 'none';
+    const errContent = 'Sorry, I encountered an error. Please try again.';
+    const errMsg = document.createElement('div');
+    errMsg.className = 'chat-msg assistant';
+    errMsg.textContent = errContent;
+    popoutMsgs.appendChild(errMsg);
+    popoutMsgs.scrollTop = popoutMsgs.scrollHeight;
+    syncMessageToSidePanel('assistant', errContent, false);
+  }
+  sendBtn.disabled = false;
+}
+
+// --- Chart Popout ---
+let popoutChartInstance = null;
+const TAB_TITLES = {
+  distance: 'Bacteria Concentration vs Distance from Outfall',
+  yearly: 'Enterococcus Bacteria Trend (All Stations)',
+  compare: 'Point Loma vs South Bay — Enterococcus Trend',
+  monthly: 'Monthly Bacteria Levels (2020–Present)',
+  fish: 'Metal Contamination in Fish Tissue by Species',
+  noaa: 'Live Ocean Conditions — SD Bay + Buoys',
+};
+
+function getActiveTab() {
+  const active = document.querySelector('.tab.active');
+  return active ? active.dataset.tab : 'distance';
+}
+
+async function popoutChart() {
+  const overlay = document.getElementById('popout-overlay');
+  const title = document.getElementById('popout-title');
+  const tab = getActiveTab();
+  title.textContent = TAB_TITLES[tab] || 'Chart';
+  overlay.classList.add('visible');
+
+  // Small delay to let the DOM render the overlay before creating chart
+  await new Promise(r => setTimeout(r, 50));
+  renderPopoutForTab(tab);
+}
+
+function closePopout() {
+  document.getElementById('popout-overlay').classList.remove('visible');
+  if (popoutChartInstance) { popoutChartInstance.destroy(); popoutChartInstance = null; }
+}
+
+async function renderPopoutForTab(tab) {
+  if (popoutChartInstance) { popoutChartInstance.destroy(); popoutChartInstance = null; }
+  const ctx = document.getElementById('popout-canvas').getContext('2d');
+  const interpretEl = document.getElementById('popout-interpret');
+
+  if (tab === 'distance') {
+    popoutChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: distanceData.map(d => d.distance), datasets: [{ label: 'Avg Enterococcus (CFU/100mL)', data: distanceData.map(d => d.avg), backgroundColor: distanceData.map(d => getColor(d.avg)), borderRadius: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Bacteria Concentration vs Distance from Outfall', color: '#c9d6e3' }, legend: { display: false } }, scales: { y: { ticks: { color: '#5e7a96' }, grid: { color: '#1a3050' } }, x: { ticks: { color: '#5e7a96' }, grid: { display: false } } } }
+    });
+    const nearest = distanceData.find(d => d.distance === '0-2 km');
+    const farthest = distanceData.find(d => d.distance === '20+ km') || distanceData[distanceData.length - 1];
+    const highest = [...distanceData].sort((a,b) => b.avg - a.avg)[0];
+    interpretEl.innerHTML = `<h4>What does this mean?</h4>
+      <p>This chart shows the <strong>average bacteria levels</strong> in ocean water at different distances from where San Diego dumps its treated sewage (the "outfall pipe").</p>
+      <p>Each bar represents a distance zone. <span class="safe-highlight">Green bars</span> mean the water is considered safe for swimming. <span class="danger-highlight">Red bars</span> mean bacteria levels exceed EPA safety limits — you'd want to avoid swimming there.</p>
+      <p>Surprisingly, water <strong>closest to the pipe</strong> (${nearest ? nearest.distance : '0-2 km'}) has only <span class="stat-highlight">${nearest ? Math.round(nearest.avg) : '?'} CFU</span> — that's because the pipe releases water deep underwater (320 ft), where it gets heavily diluted. The <strong>worst contamination</strong> is at <span class="danger-highlight">${highest.distance}</span> with <span class="danger-highlight">${Math.round(highest.avg)} CFU</span>, likely from land-based runoff and cross-border sewage.</p>
+      <div class="takeaway">The sewage pipe itself isn't the biggest problem — storm drains, urban runoff, and cross-border flows from Tijuana cause the worst beach contamination.</div>`;
+  } else if (tab === 'yearly') {
+    const data = await fetch('/api/bacteria/yearly?parameter=ENTERO').then(r => r.json());
+    popoutChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: { labels: data.map(d => d.year), datasets: [
+        { label: 'Average', data: data.map(d => d.avg), borderColor: '#00b4d8', backgroundColor: 'rgba(0,180,216,0.1)', fill: true, tension: 0.3, pointRadius: 2 },
+        { label: 'Max', data: data.map(d => d.max), borderColor: '#ef4444', borderDash: [5,5], pointRadius: 0, tension: 0.3 },
+      ] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Enterococcus Bacteria Trend (All Stations)', color: '#c9d6e3' }, legend: { labels: { color: '#5e7a96' } } }, scales: { y: { ticks: { color: '#5e7a96' }, grid: { color: '#1a3050' } }, x: { ticks: { color: '#5e7a96', maxTicksLimit: 12 }, grid: { display: false } } } }
+    });
+    const first5 = data.slice(0, 5);
+    const last5 = data.slice(-5);
+    const earlyAvg = first5.reduce((s,d) => s + d.avg, 0) / first5.length;
+    const recentAvg = last5.reduce((s,d) => s + d.avg, 0) / last5.length;
+    const peakYear = data.reduce((best, d) => d.max > best.max ? d : best, data[0]);
+    const trend = recentAvg < earlyAvg ? 'improving' : 'worsening';
+    const pctChange = Math.abs(Math.round((recentAvg - earlyAvg) / earlyAvg * 100));
+    interpretEl.innerHTML = `<h4>What does this mean?</h4>
+      <p>This chart tracks <strong>bacteria levels in San Diego's ocean water over ${data.length} years</strong>. The <span class="stat-highlight">blue line</span> shows the average bacteria reading each year. The <span class="danger-highlight">red dashed line</span> shows the worst single reading — think of it as the "worst day" each year.</p>
+      <p>The overall trend is <strong>${trend}</strong>. Average bacteria in the early 2000s was around <span class="stat-highlight">${Math.round(earlyAvg)} CFU</span>, and recently it's around <span class="stat-highlight">${Math.round(recentAvg)} CFU</span> — a <span class="${trend === 'improving' ? 'safe-highlight' : 'danger-highlight'}">${pctChange}% ${trend === 'improving' ? 'decrease' : 'increase'}</span>.</p>
+      <p>The biggest spike was in <span class="danger-highlight">${peakYear.year}</span> when a single reading hit <span class="danger-highlight">${peakYear.max.toLocaleString()} CFU</span> — likely from a major sewage spill or heavy rainstorm washing pollution into the ocean.</p>
+      <div class="takeaway">${trend === 'improving' ? 'Good news: ocean water quality has generally been getting better over time, though occasional spikes still happen during storms or infrastructure failures.' : 'Bacteria levels have been trending upward, which may reflect aging infrastructure, population growth, or increased cross-border sewage flows.'}</div>`;
+  } else if (tab === 'compare') {
+    const [ploo, sboo] = await Promise.all([
+      fetch('/api/bacteria/yearly?parameter=ENTERO&project=PLOO').then(r => r.json()),
+      fetch('/api/bacteria/yearly?parameter=ENTERO&project=SBOO').then(r => r.json()),
+    ]);
+    const years = [...new Set([...ploo.map(d => d.year), ...sboo.map(d => d.year)])].sort();
+    const plooMap = Object.fromEntries(ploo.map(d => [d.year, d.avg]));
+    const sbooMap = Object.fromEntries(sboo.map(d => [d.year, d.avg]));
+    popoutChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: { labels: years, datasets: [
+        { label: 'PLOO', data: years.map(y => plooMap[y] || null), borderColor: '#00b4d8', tension: 0.3, pointRadius: 2 },
+        { label: 'SBOO', data: years.map(y => sbooMap[y] || null), borderColor: '#f59e0b', tension: 0.3, pointRadius: 2 },
+      ] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Point Loma vs South Bay — Enterococcus Trend', color: '#c9d6e3' }, legend: { labels: { color: '#5e7a96' } } }, scales: { y: { ticks: { color: '#5e7a96' }, grid: { color: '#1a3050' } }, x: { ticks: { color: '#5e7a96', maxTicksLimit: 12 }, grid: { display: false } } } }
+    });
+    const plooRecent = ploo.slice(-5);
+    const sbooRecent = sboo.slice(-5);
+    const plooAvg = plooRecent.reduce((s,d) => s + d.avg, 0) / (plooRecent.length || 1);
+    const sbooAvg = sbooRecent.reduce((s,d) => s + d.avg, 0) / (sbooRecent.length || 1);
+    const ratio = sbooAvg > 0 && plooAvg > 0 ? Math.round(sbooAvg / plooAvg) : '?';
+    interpretEl.innerHTML = `<h4>What does this mean?</h4>
+      <p>This chart compares bacteria levels at San Diego's <strong>two sewage outfall locations</strong>:</p>
+      <p><span class="stat-highlight">PLOO (blue)</span> = Point Loma Ocean Outfall — San Diego's main pipe, 4.5 miles offshore in deep water. This serves most of the city.</p>
+      <p><span class="danger-highlight">SBOO (yellow)</span> = South Bay Ocean Outfall — near the Mexican border and Tijuana River. This area receives cross-border sewage flows from Tijuana.</p>
+      <p>In recent years, South Bay averages <span class="danger-highlight">${Math.round(sbooAvg)} CFU</span> compared to Point Loma's <span class="safe-highlight">${Math.round(plooAvg)} CFU</span> — that's roughly <span class="danger-highlight">${ratio}x worse</span>.</p>
+      <div class="takeaway">The cross-border sewage from Tijuana is by far the biggest water quality problem for San Diego's beaches. Communities near South Bay (like Imperial Beach) bear the worst impact, and they tend to be lower-income neighborhoods — making this an environmental justice issue.</div>`;
+  } else if (tab === 'monthly') {
+    const data = await fetch('/api/bacteria/monthly?parameter=ENTERO&startYear=2020').then(r => r.json());
+    popoutChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: { labels: data.map(d => d.month), datasets: [
+        { label: 'Avg Bacteria', data: data.map(d => d.avg), borderColor: '#00b4d8', backgroundColor: 'rgba(0,180,216,0.1)', fill: true, tension: 0.3, pointRadius: 0, yAxisID: 'y' },
+        { label: 'Exceedances', data: data.map(d => d.exceedances), borderColor: '#ef4444', type: 'bar', backgroundColor: 'rgba(239,68,68,0.5)', yAxisID: 'y1' },
+      ] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Monthly Bacteria Levels (2020-Present)', color: '#c9d6e3' }, legend: { labels: { color: '#5e7a96' } } }, scales: { y: { position: 'left', ticks: { color: '#5e7a96' }, grid: { color: '#1a3050' }, title: { display: true, text: 'Avg CFU/100mL', color: '#5e7a96' } }, y1: { position: 'right', ticks: { color: '#ef4444' }, grid: { display: false }, title: { display: true, text: 'Exceedances', color: '#ef4444' } }, x: { ticks: { color: '#5e7a96', maxTicksLimit: 12 }, grid: { display: false } } } }
+    });
+    const totalExceedances = data.reduce((s,d) => s + d.exceedances, 0);
+    const worstMonth = data.reduce((best, d) => d.exceedances > best.exceedances ? d : best, data[0]);
+    const avgAll = data.reduce((s,d) => s + d.avg, 0) / data.length;
+    interpretEl.innerHTML = `<h4>What does this mean?</h4>
+      <p>This chart shows <strong>month-by-month bacteria levels</strong> since 2020. The <span class="stat-highlight">blue line</span> is the average bacteria reading. The <span class="danger-highlight">red bars</span> show how many individual water samples exceeded the EPA safety limit (104 CFU) — each bar represents days when beaches would be considered unsafe.</p>
+      <p>Since 2020, there have been <span class="danger-highlight">${totalExceedances.toLocaleString()} total exceedances</span> across all stations. The worst month was <span class="danger-highlight">${worstMonth.month}</span> with <span class="danger-highlight">${worstMonth.exceedances} unsafe readings</span>.</p>
+      <p>The overall average is <span class="stat-highlight">${Math.round(avgAll)} CFU/100mL</span>. ${avgAll < 35 ? 'While the average is below the safety limit, the spikes are what matter for swimmers — a single bad day can make you sick.' : 'This average is above safe swimming levels, indicating persistent contamination problems.'}</p>
+      <div class="takeaway">Watch for spikes — they often follow rainstorms that wash urban pollution into the ocean, or correspond to sewage infrastructure problems. These are the days beaches get closed.</div>`;
+  } else if (tab === 'fish') {
+    const metals = fishData.flatMap(s => s.contaminants.filter(c => c.class === 'Metal').map(c => ({ species: s.species, avg: c.avg, count: c.count }))).sort((a,b) => b.avg - a.avg).slice(0, 10);
+    popoutChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: { labels: metals.map(m => m.species.length > 18 ? m.species.slice(0,18)+'...' : m.species), datasets: [{ label: 'Avg Metal Concentration (mg/kg)', data: metals.map(m => m.avg), backgroundColor: metals.map(m => m.avg > 1.0 ? '#ef4444' : m.avg > 0.5 ? '#f59e0b' : '#10b981'), borderRadius: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Metal Contamination in Fish Tissue by Species', color: '#c9d6e3' }, legend: { display: false } }, scales: { y: { ticks: { color: '#5e7a96' }, grid: { color: '#1a3050' } }, x: { ticks: { color: '#5e7a96' }, grid: { display: false } } } }
+    });
+    const highRisk = metals.filter(m => m.avg > 1.0);
+    const topSpecies = metals[0];
+    interpretEl.innerHTML = `<h4>What does this mean?</h4>
+      <p>This chart shows <strong>how much toxic metals (like mercury, lead, and arsenic) are found in fish caught near San Diego's sewage outfalls</strong>. Each bar is a fish species — taller bars mean more contamination.</p>
+      <p><span class="safe-highlight">Green bars</span> = low levels (under 0.5 mg/kg) — generally safe to eat. <span class="danger-highlight">Red bars</span> = elevated levels (over 1.0 mg/kg) — health authorities may recommend limiting consumption.</p>
+      <p>The most contaminated species is <span class="danger-highlight">${topSpecies.species}</span> at <span class="danger-highlight">${topSpecies.avg.toFixed(2)} mg/kg</span>. ${highRisk.length > 0 ? `<span class="danger-highlight">${highRisk.length} species</span> have elevated metal levels that may warrant caution.` : 'Most species tested have relatively low contamination levels.'}</p>
+      <div class="takeaway">Metals enter the ocean through treated sewage discharge and accumulate in fish over time. Larger, longer-lived predatory fish tend to have the highest levels. If you fish near the outfalls, check local advisories before eating your catch.</div>`;
+  } else if (tab === 'noaa') {
+    if (!realtimeData) realtimeData = await fetch('/api/realtime').then(r => r.json()).catch(() => null);
+    if (!realtimeData || realtimeData.error) { interpretEl.innerHTML = '<p>Live data unavailable.</p>'; return; }
+    const temps = realtimeData.sdBay.waterTemp.data;
+    const levels = realtimeData.sdBay.tideLevel.data;
+    popoutChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: { labels: temps.map(d => d.time.slice(5,16)), datasets: [
+        { label: 'Water Temp (C)', data: temps.map(d => d.value), borderColor: '#00b4d8', backgroundColor: 'rgba(0,180,216,0.08)', fill: true, tension: 0.3, pointRadius: 0, yAxisID: 'y' },
+        { label: 'Observed Tide (m)', data: levels.map(d => d.value), borderColor: '#a855f7', tension: 0.3, pointRadius: 0, yAxisID: 'y1' },
+      ] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Live Ocean Conditions — SD Bay', color: '#c9d6e3' }, legend: { labels: { color: '#5e7a96' } } }, scales: { y: { position: 'left', ticks: { color: '#00b4d8' }, grid: { color: '#1a3050' }, title: { display: true, text: 'Temp (C)', color: '#00b4d8' } }, y1: { position: 'right', ticks: { color: '#a855f7' }, grid: { display: false }, title: { display: true, text: 'Tide (m)', color: '#a855f7' } }, x: { ticks: { color: '#5e7a96', maxTicksLimit: 12 }, grid: { display: false } } } }
+    });
+    const tempVals = temps.map(d => d.value).filter(v => v !== null);
+    const currentTemp = tempVals[tempVals.length - 1];
+    const minTemp = Math.min(...tempVals);
+    const maxTemp = Math.max(...tempVals);
+    const wx = realtimeData.weather;
+    const windDesc = wx.windSpeed > 30 ? 'very windy' : wx.windSpeed > 15 ? 'breezy' : 'calm';
+    interpretEl.innerHTML = `<h4>What does this mean?</h4>
+      <p>This chart shows <strong>real-time ocean conditions</strong> in San Diego Bay right now, measured by NOAA sensors.</p>
+      <p>The <span class="stat-highlight">blue area</span> is water temperature — currently <span class="stat-highlight">${currentTemp ? currentTemp.toFixed(1) + '°C (' + (currentTemp * 9/5 + 32).toFixed(0) + '°F)' : 'unavailable'}</span>, ranging from ${minTemp.toFixed(1)}°C to ${maxTemp.toFixed(1)}°C today. The <strong style="color:#a855f7">purple line</strong> shows the tide level — the natural rise and fall of the ocean throughout the day.</p>
+      <p>Current conditions: <span class="stat-highlight">${wx.conditions || 'Unknown'}</span>, winds are <span class="stat-highlight">${windDesc}</span> at ${Math.round(wx.windSpeed || 0)} km/h.
+      ${wx.airTemp ? ` Air temperature is <span class="stat-highlight">${Math.round(wx.airTemp)}°C (${Math.round(wx.airTemp * 9/5 + 32)}°F)</span>.` : ''}</p>
+      <div class="takeaway">Ocean conditions affect how pollution disperses. Strong currents and high tides can push contaminated water toward beaches, while calm conditions may let bacteria concentrate near shore. Check these conditions alongside bacteria data when deciding if it's safe to swim.</div>`;
+  }
 }
 
 init();
